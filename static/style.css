@@ -1,0 +1,109 @@
+/* ===== Base ===== */
+body {
+    font-family: 'Montserrat', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* ===== Layout ===== */
+.content {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 12px;
+}
+.title {
+    text-align: center;
+    font-size: 28px;
+    margin-bottom: 18px;
+}
+
+/* ===== Theme Switcher ===== */
+.theme-nav {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    padding: 10px;
+}
+.theme-nav button {
+    padding: 8px 14px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 5px;
+    border: none;
+    transition: 0.2s;
+}
+.theme-nav button:hover {
+    opacity: 0.8;
+}
+
+/* ===== Camera Section ===== */
+.camera-container {
+    text-align: center;
+    margin-bottom: 24px;
+}
+video {
+    width: 100%;
+    max-width: 500px;
+    border: 3px solid #444;
+    border-radius: 10px;
+}
+.camera-buttons {
+    margin-top: 10px;
+}
+.camera-buttons button {
+    margin: 0 8px;
+    padding: 8px 16px;
+    font-size: 16px;
+}
+
+/* ===== Results ===== */
+.results-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    justify-content: center;
+}
+.results-box {
+    flex: 1;
+    min-width: 200px;
+    padding: 14px;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 18px;
+    box-shadow: 0px 4px 14px rgba(0,0,0,0.2);
+}
+
+/* ===== Chart Box ===== */
+.chart-container {
+    width: 280px;
+    height: 280px;
+}
+
+/* ===== Backgrounds ===== */
+
+/* Light theme */
+.theme-light {
+    background: linear-gradient(160deg, #01333a, #640202);
+    color: #740606;
+}
+.theme-light .theme-nav button {
+    background: #80deea;
+    color: #222;
+}
+.theme-light .results-box {
+    background: #b4a7a7;
+}
+
+/* Dark theme */
+.theme-dark {
+    background: radial-gradient(ellipse at top, #020111 0%, #191621 100%);
+    color: #c4b4b4;
+}
+.theme-dark .theme-nav button {
+    background: #333;
+    color: white;
+}
+.theme-dark .results-box {
+    background: #1f1f2e;
+}
+

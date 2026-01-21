@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bridge Damage Monitoring</title>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+
+    <!-- Your CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="theme-light">
+
+    <!-- THEME SWITCHER -->
+    <nav class="theme-nav">
+        <button onclick="setTheme('light')">Light</button>
+        <button onclick="setTheme('dark')">Dark</button>
+    </nav>
+
+    <div class="content">
+
+        <h2 class="title">Bridge Inspection & Damage</h2>
+
+        <!-- CAMERA SECTION -->
+        <div class="camera-container">
+            <video id="camera-stream" autoplay playsinline></video>
+            <div class="camera-buttons">
+                <button id="start-camera">Start Camera</button>
+                <button id="capture-photo" disabled>Capture & Analyze</button>
+            </div>
+        </div>
+
+        <!-- RESULTS + CHART -->
+        <div class="results-container">
+
+            <div class="results-box">
+                <p id="resultText">Status: —</p>
+                <p id="damageText">Damage: —</p>
+                <p id="lifeText">Life: —</p>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="damageChart"></canvas>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Hidden snapshot -->
+    <canvas id="snapshot" width="480" height="360" style="display:none;"></canvas>
+
+<script>
+    // ===== THEME SWITCH =====
+    function setTheme(theme) {
+        document.body.className = "theme-" + theme;
+    }
+
+    // ===== PIE CHART =====
+    let chart;
+    function initChart() {
+        const ctx = document.getElementById("damageChart").getContext("2d");
+        chart = new Chart(ctx, {
+            type: "pie",
+            data: {
+                labels: ["Damage", "Healthy"],
+                datasets: [{
+                    data: [0, 100],
+                    backgroundColor: ["#e74c3c","#27ae60"],
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+    }
+    function updateChart(val) {
+        chart.data.datasets[0].data = [val, 100 - val];
+        chart.update();
+    }
+    initChart();
+
+    // ===== CAMERA + CAPTURE =====
+    const startBtn = document.getElementById("start-camera");
+    const capBtn   = document.getElementById("capture-photo");
+    const video    = document.getElementById("camera-stream");
+
+    const resultText = document.getElementById("resultText");
+    const damageText = document.getElementById("damageText");
+    const lifeText   = document.getElementById("lifeText");
+
+    const snap = document.getElementById("snapshot");
+
+    startBtn.onclick = async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video:true });
+            video.srcObject = stream;
+            capBtn.disabled = false;
+        } catch (err) {
+            alert("Camera access error: " + err.message);
+        }
+    };
+
+    capBtn.onclick = () => {
+        const ctx = snap.getContext("2d");
+        ctx.drawImage(video, 0, 0, snap.width, snap.height);
+
+        const imageData = snap.toDataURL("image/png");
+
+        resultText.innerText = "Analyzing... please wait.";
+
+        fetch("/analyze", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ image: imageData })
+        })
+        .then(res => res.json())
+        .then(data => {
+            resultText.innerText = "Status: " + data.status;
+            damageText.innerText = "Damage: " + data.damage_pct + "%";
+            lifeText.innerText = "Life: " + data.life;
+            updateChart(parseFloat(data.damage_pct));
+        })
+        .catch(() => {
+            resultText.innerText = "Analysis failed!";
+        });
+    };
+</script>
+
+</body>
+</html>
+
+
